@@ -1,0 +1,14 @@
+GIAB HG002 Real Data Comparison (100 reads)
+=============================================
+
+GenoCache Results:
+  Mapped:    21/100 (21%)
+  Unmapped:  79/100 (79%)
+  Secondaries: 18
+  Speed:     0.93 reads/sec
+  Time:      108s
+
+minimap2 Results:
+139
+  Mapped:    ~94/100 (94%)
+  Unmapped:  ~6/100 (6%)

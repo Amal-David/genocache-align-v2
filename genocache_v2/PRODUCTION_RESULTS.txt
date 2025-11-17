@@ -1,0 +1,36 @@
+GenoCache-Align V2 - Production Test Results
+=============================================
+
+Date: November 11, 2025
+Hardware: NVIDIA H100 80GB HBM3
+Dataset: Human GRCh38 chr22 (50.8 Mbp)
+
+Test Configuration:
+- Reads: 10,000 generated (7,709 valid)
+- Read length: 2,000 bp
+- Seeds per read: 5 (512bp each)
+- FAISS index: IVFPQ (1.6M vectors, 68MB)
+- Model: ImprovedCNN (256-D embeddings)
+
+Results:
+- Total reads: 7,709
+- Mapped reads: 7,709 (100%)
+- Unmapped: 0
+- Time: 3m 42s (222 seconds)
+- Throughput: 35 reads/sec
+
+Performance Breakdown:
+- Model inference: ~28 reads/sec
+- FAISS search: ~1ms per seed
+- Candidate selection: negligible
+
+Scalability:
+- Current: 35 reads/sec (1 GPU)
+- With batching: ~100+ reads/sec (estimated)
+- Multi-GPU: Linear scaling expected
+
+Next Steps:
+1. Whole genome training (all chromosomes)
+2. Benchmark vs minimap2
+3. Add Hyena rescue tier
+4. Clinical validation

@@ -1,0 +1,59 @@
+# CRITICAL FILES - GenoCache V4 EXTEND Phase Fix
+
+## Core Implementation (MUST HAVE)
+/home/nebius/genocache/genocache-v4/extend_phase.py
+/home/nebius/genocache/genocache-v4/adaptive_seeding.py
+/home/nebius/genocache/genocache-v4/fast_alignment.py
+
+## Validation & Testing
+/home/nebius/genocache/genocache-v4/test_extend_mock.py
+/home/nebius/genocache/genocache-v4/compare_chromosome_accuracy.py
+/home/nebius/genocache/genocache-v4/test_complete_10reads.sam
+/home/nebius/genocache/genocache-v4/minimap2_same_10reads.sam
+
+## WFA-GPU
+/home/nebius/genocache/genocache-v4/WFA-GPU/build/libwfagpu.so
+/home/nebius/genocache/genocache-v4/wfa_gpu_wrapper.py
+/home/nebius/genocache/genocache-v4/install_wfa_gpu.sh
+
+## Documentation (READ THESE)
+/home/nebius/genocache/genocache-v4/NEW_DROID_SESSION_HANDOFF.md
+/home/nebius/genocache/genocache-v4/HOW_NEURALIGNER_SOLVED_IT.md
+/home/nebius/genocache/genocache-v4/COMPLETE_FIX_SUMMARY.md
+/home/nebius/genocache/genocache-v4/AUTONOMOUS_EXECUTION_REPORT.md
+/home/nebius/genocache/genocache-v4/HONEST_COMPARISON_RESULTS.md
+
+## Model & Index (LARGE FILES)
+/home/nebius/genocache/genocache-v4/models/checkpoints/fullgenome_best_sep12.4035_epoch30.pt
+/home/nebius/genocache/genocache-v4/indexes/genocache_v4_production.index
+/home/nebius/genocache/genocache-v4/indexes/genocache_v4_production.metadata.pkl
+
+## Reference
+/home/nebius/genocache/GRCh38.fa
+
+## Test Data
+/home/nebius/genocache/genocache-production/reads_chr22_synth_1kb_500.fa
+
+---
+
+## Quick Commands
+
+# Verify mock test still works
+cd /home/nebius/genocache/genocache-v4
+python3 test_extend_mock.py
+
+# Should output: ✅ SUCCESS: 0.0% → 100.0%
+
+# Check files exist
+ls -lah extend_phase.py adaptive_seeding.py test_extend_mock.py
+
+# Read documentation
+cat NEW_DROID_SESSION_HANDOFF.md
+
+# Compare existing SAM files
+python3 compare_chromosome_accuracy.py
+
+---
+
+STATUS: All files present and tested
+NEXT: Read NEW_DROID_SESSION_HANDOFF.md for instructions

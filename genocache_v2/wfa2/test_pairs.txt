@@ -1,0 +1,4 @@
+>query
+ACGTACGTACGT
+>ref
+ACGTTCGTACGT

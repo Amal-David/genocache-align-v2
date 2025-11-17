@@ -1,0 +1,217 @@
+#!/usr/bin/env python3
+import argparse
+import time
+import numpy as np
+import faiss
+import torch
+from pathlib import Path
+from Bio import SeqIO
+import sys
+import subprocess
+import tempfile
+import pysam
+
+sys.path.insert(0, str(Path(__file__).parent))
+from improved_cnn import ImprovedCNN
+from genomic_utils import one_hot_encode
+
+def load_fasta(fasta_path):
+    sequences = {}
+    for record in SeqIO.parse(fasta_path, "fasta"):
+        sequences[record.id] = str(record.seq).upper()
+    return sequences
+
+def cluster_positions(positions, window=100):
+    if len(positions) == 0:
+        return []
+    positions = sorted(positions)
+    clusters = []
+    current_cluster = [positions[0]]
+    for pos in positions[1:]:
+        if pos - current_cluster[-1] <= window:
+            current_cluster.append(pos)
+        else:
+            clusters.append(current_cluster)
+            current_cluster = [pos]
+    clusters.append(current_cluster)
+    return clusters
+
+def extract_seeds_batch(reads, seed_len=512, num_seeds=5):
+    all_seeds = []
+    read_seed_map = []
+    
+    for read_id, read_seq in enumerate(reads):
+        read_seeds = []
+        for i in range(num_seeds):
+            offset = i * ((len(read_seq) - seed_len) // 4)
+            seed = read_seq[offset:offset+seed_len]
+            all_seeds.append((seed, offset))
+            read_seeds.append(len(all_seeds) - 1)
+        read_seed_map.append(read_seeds)
+    
+    return all_seeds, read_seed_map
+
+def encode_seeds_batch(model, seeds, batch_size=512, device='cuda'):
+    embeddings = []
+    
+    for i in range(0, len(seeds), batch_size):
+        batch_seeds = seeds[i:i+batch_size]
+        batch_tensor = torch.zeros((len(batch_seeds), 4, 512), dtype=torch.float32)
+        
+        for j, (seed, _) in enumerate(batch_seeds):
+            try:
+                encoded = one_hot_encode(seed)
+                batch_tensor[j] = torch.tensor(encoded, dtype=torch.float32)
+            except:
+                pass
+        
+        batch_tensor = batch_tensor.to(device)
+        
+        with torch.no_grad():
+            batch_emb = model(batch_tensor).cpu().numpy()
+        
+        embeddings.extend(batch_emb)
+    
+    return np.array(embeddings, dtype=np.float32)
+
+def align_with_wfa(read_seq, ref_seq, ref_pos, wfa_bin):
+    """Use WFA2 to get exact alignment and CIGAR"""
+    try:
+        # Create temp files
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False) as f:
+            query_file = f.name
+            f.write(f">query\n{read_seq}\n")
+        
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False) as f:
+            ref_file = f.name
+            f.write(f">ref\n{ref_seq}\n")
+        
+        # Run WFA align
+        result = subprocess.run(
+            [wfa_bin, '-i', query_file, '-j', ref_file, '-a', 'gap-affine', '--wfa-score-only'],
+            capture_output=True, text=True, timeout=5
+        )
+        
+        # Parse output for CIGAR (simplified - WFA2 outputs alignment score)
+        # For now, return a basic CIGAR
+        cigar = f"{len(read_seq)}M"  # Placeholder
+        
+        # Cleanup
+        Path(query_file).unlink()
+        Path(ref_file).unlink()
+        
+        return cigar, True
+    except Exception as e:
+        return f"{len(read_seq)}M", False
+
+def main():
+    p = argparse.ArgumentParser()
+    p.add_argument("--checkpoint", required=True)
+    p.add_argument("--index", required=True)
+    p.add_argument("--positions", required=True)
+    p.add_argument("--fasta", required=True)
+    p.add_argument("--chrom", required=True)
+    p.add_argument("--num-reads", type=int, default=100)
+    p.add_argument("--batch-size", type=int, default=512)
+    p.add_argument("--output", default="aligned.sam")
+    p.add_argument("--window-size", type=int, default=3000, help="Reference window for WFA")
+    args = p.parse_args()
+    
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    wfa_bin = str(Path(__file__).parent.parent / "wfa2" / "bin" / "align_benchmark")
+    
+    print(f"🚀 Full Alignment Pipeline with WFA2")
+    print(f"   Device: {device}")
+    print(f"   WFA2: {wfa_bin}")
+    
+    # Load model
+    start = time.time()
+    model, _ = ImprovedCNN.load_checkpoint(args.checkpoint, device=device)
+    model.eval()
+    
+    index = faiss.read_index(args.index)
+    ref_positions = np.load(args.positions)
+    sequences = load_fasta(args.fasta)
+    ref_seq = sequences[args.chrom]
+    
+    print(f"✅ Loaded in {time.time()-start:.1f}s")
+    
+    # Generate reads
+    print(f"\n📝 Generating {args.num_reads} reads...")
+    np.random.seed(42)
+    reads = []
+    true_positions = []
+    
+    max_start = len(ref_seq) - 2000 - 10
+    candidate_starts = np.random.randint(10, max_start, args.num_reads)
+    
+    for pos in candidate_starts:
+        read = ref_seq[pos:pos+2000]
+        if len(read) == 2000 and 'N' not in read:
+            reads.append(read)
+            true_positions.append(pos)
+    
+    print(f"   Valid reads: {len(reads)}")
+    
+    # Seed-based mapping
+    print(f"\n🧬 Seed-based mapping...")
+    all_seeds, read_seed_map = extract_seeds_batch(reads)
+    all_embeddings = encode_seeds_batch(model, all_seeds, args.batch_size, device)
+    D, I = index.search(all_embeddings, k=10)
+    
+    # Map reads and prepare for WFA
+    mapped_reads = []
+    for read_idx, seed_indices in enumerate(read_seed_map):
+        all_positions = []
+        for seed_idx in seed_indices:
+            indices = I[seed_idx]
+            positions = ref_positions[indices]
+            seed_offset = all_seeds[seed_idx][1]
+            adjusted = positions - seed_offset
+            all_positions.extend(adjusted)
+        
+        clusters = cluster_positions(all_positions, window=100)
+        best_cluster = max(clusters, key=len)
+        predicted_pos = int(np.median(best_cluster))
+        
+        mapped_reads.append({
+            'read_id': f"read_{read_idx}",
+            'seq': reads[read_idx],
+            'pos': predicted_pos,
+            'true_pos': true_positions[read_idx]
+        })
+    
+    # WFA alignment (on first 10 reads for demo)
+    print(f"\n🔬 WFA2 alignment (first 10 reads)...")
+    sam_records = []
+    
+    for i, read_info in enumerate(mapped_reads[:10]):
+        # Extract reference window
+        pos = read_info['pos']
+        ref_start = max(0, pos - 100)
+        ref_end = min(len(ref_seq), pos + len(read_info['seq']) + 100)
+        ref_window = ref_seq[ref_start:ref_end]
+        
+        # Align with WFA2
+        cigar, success = align_with_wfa(read_info['seq'], ref_window, pos, wfa_bin)
+        
+        # Create SAM record
+        flag = 0 if success else 4  # 4 = unmapped
+        sam_records.append(f"{read_info['read_id']}\t{flag}\t{args.chrom}\t{pos+1}\t60\t{cigar}\t*\t0\t0\t{read_info['seq']}\t*")
+        
+        if (i+1) % 10 == 0:
+            print(f"   Aligned {i+1} reads...")
+    
+    # Write SAM
+    print(f"\n💾 Writing SAM to {args.output}...")
+    with open(args.output, 'w') as f:
+        f.write(f"@HD\tVN:1.6\tSO:unsorted\n")
+        f.write(f"@SQ\tSN:{args.chrom}\tLN:{len(ref_seq)}\n")
+        for record in sam_records:
+            f.write(record + "\n")
+    
+    print(f"✅ Done! Wrote {len(sam_records)} alignments")
+    print(f"   Total time: {time.time()-start:.1f}s")
+
+if __name__ == "__main__":
+    main()

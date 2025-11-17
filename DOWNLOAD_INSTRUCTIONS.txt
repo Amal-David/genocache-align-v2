@@ -1,0 +1,45 @@
+GenoCache V3 - Download Instructions
+=====================================
+
+MODEL WEIGHTS LOCATION:
+/home/nebius/genocache/genocache-v3-backup.tar.gz
+
+FILE SIZE: 14 MB
+MD5: a5e8e472c6b1ce72fb729af7d9a5c802
+
+DOWNLOAD COMMAND:
+scp nebius@<server>:/home/nebius/genocache/genocache-v3-backup.tar.gz .
+
+EXTRACT:
+tar -xzf genocache-v3-backup.tar.gz
+
+CONTENTS:
+- model/genocache_best.pt (6.1 MB) - Trained model weights
+- code/ (5 files) - Core implementation
+- results/ - Validation data
+- docs/ - Complete documentation
+
+DOCUMENTATION:
+1. README.md - Quick overview
+2. SESSION_SUMMARY.md - Complete session (40 KB)
+3. FILES_MANIFEST.md - What's backed up
+4. V4_TRAINING_PLAN.md - Next iteration strategy
+
+USAGE:
+import torch
+from genocache_encoder import GenoCacheEncoder
+
+model = GenoCacheEncoder(seed_len=512, emb_dim=256)
+checkpoint = torch.load("model/genocache_best.pt")
+model.load_state_dict(checkpoint['model_state_dict'])
+model.eval()
+
+STATUS:
+✅ Works: 90% accuracy on clean reads
+❌ Fails: 27% accuracy on noisy ONT reads (8% error)
+🎯 Solution: V4 with error-augmented training
+
+NEXT STEPS:
+Follow V4_TRAINING_PLAN.md to build error-tolerant version
+Expected timeline: 3-4 days
+Target accuracy: 95%+ on ONT reads
