@@ -1,0 +1,63 @@
+{
+  "schema": "genocache.verification.v1",
+  "date_utc": "2026-10-07",
+  "baseline_commit": "bcec02bad0cd22d0d24529cfa15e207d00a1779d",
+  "platform": "Linux-6.18.44-x86_64-with-glibc2.39",
+  "python": "3.12.14",
+  "suite": {
+    "command": "MINIMAP2=/path/to/minimap2 pytest production/tests -q",
+    "passed": 212,
+    "subtests_passed": 173,
+    "failed": 0,
+    "skipped": 0,
+    "wall_seconds": 4.09,
+    "warnings": 3,
+    "warning_scope": "TorchScript deprecation warnings in optional CPU Torch contract test",
+    "legacy_diagnostic_tests": 12,
+    "legacy_test_interpretation": "Green legacy tests reproduce archived failures; new engine acceptance tests assert corrected behavior."
+  },
+  "lint": {
+    "command": "ruff check production",
+    "passed": true
+  },
+  "package_build": {
+    "command": "uv build --wheel",
+    "passed": true,
+    "wheel": "genocache_production-0.1.0-py3-none-any.whl"
+  },
+  "backend_versions": {
+    "numpy": "2.5.3",
+    "pysam": "0.24.1",
+    "faiss-cpu": "1.15.1",
+    "torch": "2.14.1+cpu",
+    "boto3": "1.43.108",
+    "modal": "1.6.1",
+    "pytest": "9.1.1",
+    "ruff": "0.16.10"
+  },
+  "native": {
+    "version": "2.31-r1302",
+    "source_commit": "3c28777e7e2dcc90f825de1b9f17a89cca7d4452",
+    "binary_sha256": "7b3bfc4e7fd592de54e1cea9bef9793e160eb05dbb0f5d55f94c5b3b670ec55a"
+  },
+  "offline_deployment_checks": {
+    "modal_definition_import": true,
+    "modal_sdk_signature_check": true,
+    "batch_register_job_definition_shape": true,
+    "entrypoints_resolve": true
+  },
+  "integration_receipt": {
+    "path": "reports/local-benchmark.json",
+    "sha256": "14bf2a747170a627cbbb6c35e99ab2d1fc482ffb8f156167d7bfa550c94d69cc"
+  },
+  "not_executed": [
+    "Docker image build",
+    "Live Modal deployment/job",
+    "Live AWS Batch job",
+    "GPU inference or search",
+    "Human whole-genome accuracy/throughput",
+    "Neural accepted alignment route",
+    "Parabricks comparator run"
+  ],
+  "scope": "Local CPU software and small synthetic integration verification. No production capacity, clinical accuracy, or novel-read speedup claim."
+}

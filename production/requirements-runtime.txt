@@ -1,0 +1,7 @@
+# Direct dependencies pinned to the versions used by this implementation.
+# For a released image, record the image digest in addition to this source list.
+numpy==2.5.3
+pysam==0.24.1
+faiss-cpu==1.15.1
+boto3==1.43.108
+modal==1.6.1

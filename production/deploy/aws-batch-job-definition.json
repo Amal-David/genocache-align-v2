@@ -1,0 +1,27 @@
+{
+  "jobDefinitionName": "genocache-production",
+  "type": "container",
+  "platformCapabilities": ["EC2"],
+  "parameters": {
+    "manifest": "s3://YOUR_BUCKET/jobs/job.json"
+  },
+  "containerProperties": {
+    "image": "YOUR_ACCOUNT.dkr.ecr.YOUR_REGION.amazonaws.com/genocache@sha256:YOUR_IMAGE_DIGEST",
+    "jobRoleArn": "arn:aws:iam::YOUR_ACCOUNT:role/GenocacheWorkerRole",
+    "command": [
+      "genocache-cloud",
+      "--root", "/tmp/genocache-worker",
+      "run", "--manifest", "Ref::manifest"
+    ],
+    "resourceRequirements": [
+      {"type": "VCPU", "value": "8"},
+      {"type": "MEMORY", "value": "61440"}
+    ],
+    "environment": [
+      {"name": "OMP_NUM_THREADS", "value": "8"}
+    ],
+    "logConfiguration": {"logDriver": "awslogs"}
+  },
+  "retryStrategy": {"attempts": 2},
+  "timeout": {"attemptDurationSeconds": 86400}
+}
