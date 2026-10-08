@@ -144,8 +144,10 @@ limitations and current primary research sources.
 
 ## Evidence from this implementation
 
-Verified on 7 October 2026: **212 tests passed**, plus **173 subtests**, with
-Ruff clean. The suite exercises native minimap2 v2.31, pysam,
+Verified on Linux on 7 October 2026: **214 public tests passed**, plus **173
+subtests**, with Ruff clean. The final cloud acceptance run passed 217 tests,
+including three additional private canonical-checkpoint diagnostic checks.
+The public suite exercises native minimap2 v2.31, pysam,
 CPU FAISS and CPU Torch. Twelve tests reproduce archived defects; a green legacy
 audit means those old failures were reproduced. New-engine tests separately
 assert corrected behavior. TorchScript emitted three deprecation warnings in
@@ -189,11 +191,18 @@ cannot masquerade as a cold run.
 ## Deployment and operating scope
 
 Use [DEPLOYMENT.md](docs/DEPLOYMENT.md) for Docker, Modal and AWS Batch commands.
-The definitions have passed local SDK/schema checks. Archive relocation and
-S3 publication order have integration tests using real mapping and a fake S3
-client. **The Docker image has not been built here and no live Modal/AWS job has
-been run.** Image construction and a first authenticated cloud smoke job remain
-deployment gates in the user's account.
+The Docker image and authenticated Modal functions were exercised against real
+S3 on 7 October 2026. A separate AWS EC2/SSM worker passed the same synthetic
+mapping and artifact-download checks. Both providers preserved the independent
+native record multiset, returned verified exact-repeat cache hits, placed
+128/128 known-origin reads within 100 bp on the correct strand, and left all
+eight unrelated controls unmapped. The AWS Batch definition has not been
+deployed. These bounded synthetic calls do not qualify real WGS workloads.
+
+The pilot used temporary AWS login credentials in a Modal secret. The exported
+session expires independently of local CLI refresh. Refresh the secret and
+redeploy before another bounded call; durable scoped authentication or a refresh
+mechanism is required before unattended long jobs. See the deployment guide.
 
 Local locks are appropriate for one machine's POSIX filesystem. Each worker
 uses a local cache; S3 holds immutable packs and completed output manifests.

@@ -9,8 +9,15 @@ Local tests exercised real native mapping, reference-pack relocation, checksum
 failures, retry isolation and S3 publication order. Modal 1.6.1 imports this app
 definition, and botocore validates the Batch job-definition schema. Docker image
 construction and live cloud execution were not available in the development
-environment. Build the image and complete the smoke job below before submitting
-a large sample.
+environment of the original handoff. A subsequent live pilot on 2026-10-07 built
+the image on AWS EC2 and Modal, ran the deterministic 800 kb/136-read panel through
+real S3 staging and publication, downloaded and verified BAM/CSI artifacts, and
+exercised both deployed Modal functions. The 128 known-origin reads agreed within
+100 bp and strand, all eight unrelated controls remained unmapped, 64 secondary
+records were preserved, and an identical repeated job hit the verified cache.
+This qualifies the small native-worker workflow; it does not establish human-WGS
+accuracy, capacity, learned alignment, or a speed advantage. Complete a sample-
+specific smoke job before submitting a large sample.
 
 ## 1. Build and check the image
 
@@ -107,6 +114,14 @@ Configure credentials in the [Modal Secrets panel](https://modal.com/secrets)
 or your existing secret-management workflow; no credentials belong in the job
 JSON or source tree. See [Modal Secrets](https://modal.com/docs/guide/secrets).
 
+Temporary credentials exported from an AWS CLI login have their own expiration,
+which can be about 15 minutes even while the local CLI refreshes its session.
+Copying them into a Modal Secret does not transfer that refresh mechanism. For a
+bounded session-backed invocation, refresh the Secret and redeploy before the
+job, and complete staging and final upload before expiry. Long jobs require an
+approved durable credential-refresh or role-based integration; the live pilot
+did not provision one.
+
 Deploy the two authenticated functions:
 
 ```bash
@@ -115,7 +130,7 @@ modal deploy deploy/modal_app.py
 
 No public HTTP endpoint is created. The app defines `prepare_reference` and
 `align` using the same Dockerfile image. The initial allocation is eight CPUs,
-64 GiB RAM and 256 GiB ephemeral disk, with at most two alignment containers.
+64 GiB RAM and 512 GiB ephemeral disk, with at most two alignment containers.
 It is a pilot configuration, not a guarantee that a whole-genome sample fits.
 Modal ignores Docker's `USER` instruction and runs these functions as root;
 see [Modal image compatibility](https://modal.com/docs/guide/existing-images).

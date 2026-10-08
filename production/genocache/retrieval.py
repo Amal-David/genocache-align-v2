@@ -141,6 +141,7 @@ def build_pack(
     Coordinates are zero-based, half-open and always on the forward reference.
     strand identifies which sequence orientation the encoder saw.
     """
+    started = time.perf_counter()
     import faiss
 
     reference_sha256 = _sha(reference_sha256, "reference_sha256")
@@ -150,6 +151,10 @@ def build_pack(
     batch_rows = _integer(batch_rows, "batch_rows", 1)
     vectors, windows = Path(vectors), Path(windows)
     source_signatures = {path: file_signature(path) for path in (vectors, windows)}
+    # mmap writes can retain the same stat timestamps on some filesystems.
+    # Bind provenance to bytes observed before construction as well as after it.
+    source_digests = {path: file_sha256(path) for path in (vectors, windows)}
+    _assert_sources_unchanged(source_signatures, "input hashing")
     values = np.load(vectors, mmap_mode="r", allow_pickle=False)
     if values.ndim != 2 or not all(values.shape):
         raise ValueError("vectors must be a nonempty N x D .npy array")
@@ -159,7 +164,6 @@ def build_pack(
         raise FileExistsError(output)
     output.parent.mkdir(parents=True, exist_ok=True)
     temporary = Path(tempfile.mkdtemp(prefix=".embedding-", dir=output.parent))
-    started = time.perf_counter()
     try:
         normalized = np.lib.format.open_memmap(
             temporary / "vectors.npy", mode="w+", dtype="<f4", shape=(n, dim)
@@ -232,6 +236,9 @@ def build_pack(
         source_vectors_sha256 = file_sha256(vectors)
         source_windows_sha256 = file_sha256(windows)
         _assert_sources_unchanged(source_signatures, "index construction")
+        if (source_vectors_sha256 != source_digests[vectors]
+                or source_windows_sha256 != source_digests[windows]):
+            raise ValueError("embedding input bytes changed during index construction")
         manifest = {
             "schema": SCHEMA,
             "rows": n,

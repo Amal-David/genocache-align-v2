@@ -218,9 +218,34 @@ def test_window_row_count_failure_does_not_publish_a_partial_pack(tmp_path, row_
     assert not list(tmp_path.glob(".embedding-*"))
 
 
-def test_vector_source_mutation_during_build_invalidates_provenance(packed, tmp_path, monkeypatch):
+def test_pack_build_timer_includes_input_hashing(packed, tmp_path, monkeypatch):
+    hash_file = retrieval.file_sha256
+    clock = {"seconds": 0}
+
+    def timed_hash(path):
+        clock["seconds"] += 1
+        return hash_file(path)
+
+    monkeypatch.setattr(retrieval, "file_sha256", timed_hash)
+    monkeypatch.setattr(retrieval.time, "perf_counter", lambda: clock["seconds"])
+    result = retrieval.build_pack(
+        packed["source"], packed["windows_path"], tmp_path / "timed-pack",
+        reference_sha256=REFERENCE_SHA, encoder_sha256=ENCODER_SHA, batch_rows=2,
+    )
+    assert result["build_seconds"] == clock["seconds"]
+
+
+@pytest.mark.parametrize("unchanged_stat", [False, True])
+def test_vector_source_mutation_during_build_invalidates_provenance(
+    packed, tmp_path, monkeypatch, unchanged_stat
+):
     normalize = retrieval.normalize
     mutated = False
+    if unchanged_stat:
+        # Reproduce mmap/filesystem behavior without relying on clock resolution.
+        signatures = {path: retrieval.file_signature(path)
+                      for path in (packed["source"], packed["windows_path"])}
+        monkeypatch.setattr(retrieval, "file_signature", lambda path: signatures[path])
 
     def mutate_after_first_batch(batch):
         nonlocal mutated

@@ -205,7 +205,9 @@ chmod -R a-w "$GC_RUN"
 ```
 
 Run `python -m pytest tests -q` and `ruff check genocache scripts tests` after code
-changes. The build-time suite recorded 212 tests; this is regression evidence,
+changes. The original build-time suite recorded 212 tests. The repaired Linux
+cloud acceptance run passed 214 public tests plus three private checkpoint
+diagnostic checks, with 173 subtests; this is regression evidence,
 not exhaustive validation. Inspect skips and native dependency availability.
 The [local receipt](../reports/local-benchmark.json) covers an 800 kb synthetic
 reference: 128/128 known origins were correct and 8 known negatives stayed

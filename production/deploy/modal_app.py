@@ -19,7 +19,7 @@ image = modal.Image.from_dockerfile(ROOT / "Dockerfile", context_dir=ROOT)
     secrets=[modal.Secret.from_name("genocache-s3")],
     cpu=8,
     memory=65536,
-    ephemeral_disk=262144,
+    ephemeral_disk=524288,
     timeout=86400,
     max_containers=2,
     scaledown_window=300,
@@ -40,7 +40,7 @@ def align(manifest_uri: str) -> dict:
     secrets=[modal.Secret.from_name("genocache-s3")],
     cpu=8,
     memory=65536,
-    ephemeral_disk=262144,
+    ephemeral_disk=524288,
     timeout=86400,
     max_containers=1,
 )
