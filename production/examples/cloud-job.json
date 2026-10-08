@@ -1,0 +1,16 @@
+{
+  "schema": "genocache.cloud-job.v1",
+  "reference_pack": {
+    "uri": "s3://YOUR_BUCKET/reference-packs/PACK_ARCHIVE_SHA256.tar",
+    "sha256": "REPLACE_WITH_ARCHIVE_SHA256",
+    "reference_id": "REPLACE_WITH_REFERENCE_ID"
+  },
+  "reads": {
+    "uri": "s3://YOUR_BUCKET/inputs/reads.fastq.gz",
+    "sha256": "REPLACE_WITH_READS_SHA256"
+  },
+  "output_prefix": "s3://YOUR_BUCKET/outputs",
+  "threads": 8,
+  "timeout_seconds": 7200,
+  "output_format": "bam"
+}

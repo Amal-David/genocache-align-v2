@@ -1,0 +1,152 @@
+{
+  "schema_version": 1,
+  "evidence": "Calculated from supplied measurements or assumptions; this function does not run a benchmark.",
+  "unknown_representation": null,
+  "index": {
+    "status": "calculated",
+    "genome_bases": 3100000000,
+    "rows": 96875000,
+    "row_count_scope": "single_contig_approximation",
+    "row_rule": "One right-clipped window at starts 0, stride, ... < contig_length, per orientation.",
+    "full_chunk_containment_guaranteed_by_tiling": false,
+    "memory_bytes": {
+      "vector_payload": 49600000000,
+      "ids": 775000000,
+      "metadata": 2034375000,
+      "raw_payload_ids_metadata_subtotal": 52409375000,
+      "hnsw_base_layer_links": null,
+      "raw_with_hnsw_base_links_subtotal": null,
+      "pq_code_bytes_per_row": 16,
+      "pq_codes": 1550000000,
+      "pq_codebooks": 131072,
+      "pq_retained_full_vectors": 0,
+      "pq_payload_bookkeeping_subtotal": 4359506072,
+      "ivf_centroids": 2097152,
+      "ivf_list_headers": 0,
+      "ivf_pq_payload_bookkeeping_subtotal": 4361603224,
+      "dense_batch_score_matrix": 99200000000
+    },
+    "flops": {
+      "dense_exact_per_query_vector": 24800000000,
+      "dense_exact_per_read": 396800000000,
+      "ann_full_precision_distances_per_query": null,
+      "ivf_balanced_list_rows_per_query": 378417.96875,
+      "ivf_flat_scan_per_query": 96875000.0,
+      "ivf_flat_centroid_search_per_query": 1048576,
+      "ivf_flat_scan_and_centroids_per_query": 97923576.0,
+      "reference_encoding": null,
+      "query_encoding_per_read": null
+    },
+    "limitations": [
+      "Memory subtotals exclude allocator alignment, upper graph layers, model weights, build/search scratch, replication and framework overhead.",
+      "Dense dot products count approximately 2*rows*dimension FLOPs; top-K, normalization, memory traffic and encoder overhead are separate.",
+      "IVF row estimates assume balanced lists and are not recall guarantees; PQ lookup costs are not modeled as full-precision distances.",
+      "Containment assumes the supplied span already includes indels and windows never cross contig boundaries; it is not a biological recall guarantee."
+    ]
+  },
+  "staged_amdahl": {
+    "status": "unknown",
+    "stages": [],
+    "baseline_seconds": null,
+    "projected_stage_seconds": null,
+    "new_overhead_seconds": null,
+    "projected_seconds_including_overhead": null,
+    "stage_only_speedup": null,
+    "speedup_including_overhead": null,
+    "selected_baseline_fraction": null,
+    "idealized_selected_stage_speedup_limit": null,
+    "idealized_limit_unbounded": null,
+    "limitations": [
+      "Amdahl model assumes sequential additive stage times; overlapping pipelines need a critical-path/throughput model.",
+      "The idealized limit eliminates only the selected accelerated stages and holds other baseline work fixed; zero denominators have no finite ratio."
+    ]
+  },
+  "routing": {
+    "status": "calculated",
+    "baseline_seconds": null,
+    "front_end_fraction": 0.1,
+    "fallback_time_fraction": 0.75,
+    "fallback_read_fraction": 0.05,
+    "normalized_runtime": 0.85,
+    "projected_seconds": null,
+    "speedup": 1.1764705882352942,
+    "zero_runtime_in_idealized_model": false,
+    "target_speedup": 2.0,
+    "target_maximum_fallback_time_fraction": 0.4,
+    "target_possible_even_with_no_fallback": true,
+    "target_met_in_model": false,
+    "limitations": [
+      "front_end cost must include all new non-fallback work: embedding, ANN, candidate verification, routing, transfers and relevant output/merge overhead.",
+      "fallback_time_fraction is sum of baseline work for fallback reads divided by total baseline work, not the fraction of reads.",
+      "This additive counterfactual assumes the fallback engine and per-read baseline costs remain comparable; batching and concurrency can change them."
+    ]
+  },
+  "error_budget": {
+    "status": "unknown",
+    "candidate_miss_probability": null,
+    "pipeline_correct_probability": null,
+    "pipeline_failure_probability": null,
+    "accepted_error_contribution": null,
+    "fallback_error_contribution": null,
+    "total_error_probability": null,
+    "total_error_budget_met": null,
+    "budget_after_fallback_errors": null,
+    "maximum_accepted_error_probability": null,
+    "fallback_alone_exceeds_budget": null,
+    "candidate_miss_error_contribution": null,
+    "candidate_miss_error_budget_met": null,
+    "minimum_candidate_recall_for_miss_budget": null,
+    "miss_acceptance_is_zero": null,
+    "limitations": [
+      "The pipeline product uses conditional probabilities conditioned on all preceding successful stages; it assumes no independence.",
+      "Candidate misses produce wrong accepted mappings if no acceptable locus exists in the returned set. DP verification alone cannot establish that another locus was not missed.",
+      "The accepted/fallback error mixture uses read fractions and errors conditional on each route. The fallback subset can be harder than the overall population.",
+      "Candidate-miss error is one contribution, not the total error. Do not add it to total_error_probability because events may overlap."
+    ]
+  },
+  "union_recall": {
+    "status": "unknown",
+    "recall_lower_bound": null,
+    "recall_upper_bound": null,
+    "miss_lower_bound": null,
+    "miss_upper_bound": null,
+    "observed_union_recall": null,
+    "observed_joint_miss_probability": null,
+    "limitations": [
+      "Bounds require the same reads, reference and success definition. No independence of the two candidate sources is assumed.",
+      "Measure paired misses directly; combining two 99% recalls does not by itself imply 99.99% union recall."
+    ]
+  },
+  "cache": {
+    "status": "unknown",
+    "warm_seconds_per_request": null,
+    "amortized_build_seconds_per_request": null,
+    "seconds_per_request_including_build": null,
+    "warm_speedup": null,
+    "speedup_including_build": null,
+    "strict_speedup_hit_rate_boundary": null,
+    "strict_speedup_requires_hit_rate": null,
+    "some_feasible_hit_rate_is_faster": null,
+    "all_feasible_hit_rates_are_faster": null,
+    "cold_trace_hit_rate_upper_bound": null,
+    "uniform_stationary_hit_rate_upper_bound": null,
+    "optimal_static_histogram_hit_rate_upper_bound": null,
+    "limitations": [
+      "Lookup is charged for every request; hit and miss durations exclude lookup. Build cost is additional to the comparable baseline and needs an amortization horizon.",
+      "The cold-trace bound (requests-distinct_keys)/requests assumes no initial entries; the uniform bound assumes equiprobable keys; the histogram bound is for an oracle static cache under the supplied distribution, not a universal bound for adaptive caches.",
+      "Result-cache keys must include every input affecting alignment. Reuse of a reference index is distinct from reuse of an alignment result."
+    ]
+  },
+  "observations": {
+    "illustrative_zero_errors_small_panel": {
+      "kind": "error",
+      "successes": 0,
+      "trials": 100,
+      "confidence": 0.95,
+      "estimate": 0.0,
+      "lower": 0.0,
+      "upper": 0.03699349820698566,
+      "interpretation": "Interval for the supplied counted event; zero observed errors do not prove zero population error."
+    }
+  }
+}

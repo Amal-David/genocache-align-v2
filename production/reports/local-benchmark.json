@@ -1,0 +1,212 @@
+{
+  "schema": "genocache.local-integration-benchmark.v1",
+  "scope": "synthetic 800 kb reference; not a real human genome or a learned-model benchmark",
+  "random_seed": 20261007,
+  "platform": "Linux-6.18.44-x86_64-with-glibc2.39",
+  "python": "3.12.14",
+  "minimap2_version": "2.31-r1302",
+  "minimap2_sha256": "7b3bfc4e7fd592de54e1cea9bef9793e160eb05dbb0f5d55f94c5b3b670ec55a",
+  "pysam_version": "0.24.1",
+  "inputs": {
+    "reference_sha256": "6fb15b56eb552bb692ad110b72a44b6c74db3000a23fac6ae8f28fc6ab57a35c",
+    "reads_sha256": "2a9d7d734b61fad6ecdf174efa6416d0d8ea10b9c6df5af73c12e08769d0aa37",
+    "truth_sha256": "b562afbfcb6ffdb96c32b8f6acc8057c6947fe3efd331b33101d32aa56cabb0d",
+    "format": "fastq",
+    "gzip": true,
+    "sequence_count": 136,
+    "base_count": 523129
+  },
+  "threads": 2,
+  "native_equivalent_output": {
+    "mapping_seconds": 0.164054896999005,
+    "sort_and_index_seconds": 0.06347822200041264,
+    "total_seconds": 0.22753311899941764,
+    "record_multiset_identical": true,
+    "timing_note": "Already-built .mmi; no GenoCache input snapshot/checksum/validation overhead."
+  },
+  "genocache_index_cold": {
+    "snapshot_seconds": 0.0007798340011504479,
+    "validation_seconds": 0.007044916001177626,
+    "lock_wait_seconds": 5.7376000768272206e-05,
+    "native_index_seconds": 0.08649605499886093,
+    "native_reported": {
+      "real_seconds": 0.081,
+      "cpu_seconds": 0.048,
+      "peak_rss_gb": 0.037
+    },
+    "integrity_verification_seconds": 0.0029214979986136314,
+    "request_wall_seconds": 0.10538351899958798
+  },
+  "genocache_index_warm": {
+    "snapshot_seconds": 0.0007953269996505696,
+    "validation_seconds": 0.0021153939997020643,
+    "lock_wait_seconds": 2.7852001949213445e-05,
+    "integrity_verification_seconds": 0.0028470860015659127,
+    "native_index_seconds": 0.0,
+    "original_build_metrics": {
+      "integrity_verification_seconds": 0.0029214979986136314,
+      "lock_wait_seconds": 5.7376000768272206e-05,
+      "native_index_seconds": 0.08649605499886093,
+      "native_reported": {
+        "cpu_seconds": 0.048,
+        "peak_rss_gb": 0.037,
+        "real_seconds": 0.081
+      },
+      "prepublish_wall_seconds": 0.10487290099990787,
+      "snapshot_seconds": 0.0007798340011504479,
+      "validation_seconds": 0.007044916001177626
+    },
+    "request_wall_seconds": 0.009176118001050781
+  },
+  "genocache_job_cold": {
+    "reference_verification_seconds": 0.0037075719992571976,
+    "snapshot_seconds": 0.00024064200260909274,
+    "validation_seconds": 0.00635804199919221,
+    "lock_wait_seconds": 4.8462999984622e-05,
+    "native_alignment_seconds": 0.16202054300083546,
+    "native_reported": {
+      "real_seconds": 0.16,
+      "cpu_seconds": 0.183,
+      "peak_rss_gb": 0.037
+    },
+    "conversion_seconds": 0.08268533899899921,
+    "output_validation_seconds": 0.0030957810013205744,
+    "output_verification_seconds": 0.0030549290022463538,
+    "request_wall_seconds": 0.2647467630013125
+  },
+  "genocache_job_warm": {
+    "reference_verification_seconds": 0.002643340001668548,
+    "snapshot_seconds": 0.00019426200015004724,
+    "validation_seconds": 0.01395329600200057,
+    "lock_wait_seconds": 2.133200177922845e-05,
+    "output_verification_seconds": 0.0017491429971414618,
+    "native_alignment_seconds": 0.0,
+    "conversion_seconds": 0.0,
+    "output_validation_seconds": 0.0,
+    "original_execution_metrics": {
+      "conversion_seconds": 0.08268533899899921,
+      "lock_wait_seconds": 4.8462999984622e-05,
+      "native_alignment_seconds": 0.16202054300083546,
+      "native_reported": {
+        "cpu_seconds": 0.183,
+        "peak_rss_gb": 0.037,
+        "real_seconds": 0.16
+      },
+      "output_validation_seconds": 0.0030957810013205744,
+      "output_verification_seconds": 0.0030549290022463538,
+      "prepublish_wall_seconds": 0.2644023749999178,
+      "reference_verification_seconds": 0.0037075719992571976,
+      "snapshot_seconds": 0.00024064200260909274,
+      "validation_seconds": 0.00635804199919221
+    },
+    "request_wall_seconds": 0.023244092997629195
+  },
+  "exact_repeat_cache_hit": true,
+  "same_job_id": true,
+  "warm_artifact_sha256_matches": true,
+  "mapping_evaluation": {
+    "overall": {
+      "reads": 136,
+      "reads_with_known_origins": 128,
+      "correct": 128,
+      "recall": 1.0,
+      "recall_wilson_95": {
+        "successes": 128,
+        "trials": 128,
+        "confidence": 0.95,
+        "estimate": 1.0,
+        "lower": 0.9708630437264916,
+        "upper": 1.0
+      },
+      "mapped": 128,
+      "mapping_rate": 0.9411764705882353,
+      "missing_primary_records": 0,
+      "false_mapped_known_unmappable": 0,
+      "secondary_records": 64,
+      "supplementary_records": 0,
+      "mapped_with_unavailable_mapq": 0
+    },
+    "strata": {
+      "known_unmappable": {
+        "reads": 8,
+        "reads_with_known_origins": 0,
+        "correct": 0,
+        "recall": null,
+        "recall_wilson_95": null
+      },
+      "mixed_indels": {
+        "reads": 32,
+        "reads_with_known_origins": 32,
+        "correct": 32,
+        "recall": 1.0,
+        "recall_wilson_95": {
+          "successes": 32,
+          "trials": 32,
+          "confidence": 0.95,
+          "estimate": 1.0,
+          "lower": 0.8928208017449296,
+          "upper": 1.0
+        }
+      },
+      "repeat_copies": {
+        "reads": 32,
+        "reads_with_known_origins": 32,
+        "correct": 32,
+        "recall": 1.0,
+        "recall_wilson_95": {
+          "successes": 32,
+          "trials": 32,
+          "confidence": 0.95,
+          "estimate": 1.0,
+          "lower": 0.8928208017449296,
+          "upper": 1.0
+        }
+      },
+      "substitutions_5pct": {
+        "reads": 32,
+        "reads_with_known_origins": 32,
+        "correct": 32,
+        "recall": 1.0,
+        "recall_wilson_95": {
+          "successes": 32,
+          "trials": 32,
+          "confidence": 0.95,
+          "estimate": 1.0,
+          "lower": 0.8928208017449296,
+          "upper": 1.0
+        }
+      },
+      "unique_exact": {
+        "reads": 32,
+        "reads_with_known_origins": 32,
+        "correct": 32,
+        "recall": 1.0,
+        "recall_wilson_95": {
+          "successes": 32,
+          "trials": 32,
+          "confidence": 0.95,
+          "estimate": 1.0,
+          "lower": 0.8928208017449296,
+          "upper": 1.0
+        }
+      }
+    },
+    "mapq_ge_20": {
+      "reads": 96,
+      "wrong": 0,
+      "empirical_error_rate": 0.0
+    },
+    "schema": "genocache.mapping-evaluation.v1",
+    "truth_sha256": "b562afbfcb6ffdb96c32b8f6acc8057c6947fe3efd331b33101d32aa56cabb0d",
+    "alignment_sha256": "3d0fef67a309cffbb19ce09ad8738f2335cf2e0ade69b3c4e95146b787b15705",
+    "position_tolerance_bp": 100,
+    "metric": "primary reference start and strand agree with a supplied valid origin",
+    "cigar_or_variant_accuracy_evaluated": false
+  },
+  "interpretation": {
+    "algorithmic_speedup_claim": false,
+    "cold_ratio_native_over_genocache": 0.8594368309549062,
+    "exact_repeat_ratio_cold_over_warm": 11.389851306665982,
+    "caution": "Warm hit replays the identical input batch; it does not measure novel-read throughput or real-workload hit rate."
+  }
+}

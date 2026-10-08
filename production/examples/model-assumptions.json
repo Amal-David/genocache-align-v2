@@ -1,0 +1,38 @@
+{
+  "index": {
+    "genome_bases": 3100000000,
+    "stride_bases": 32,
+    "window_bases": 512,
+    "max_query_reference_span": 512,
+    "orientations": 1,
+    "embedding_dim": 128,
+    "dtype": "float32",
+    "id_bytes": 8,
+    "metadata_bytes_per_row": 21,
+    "pq_subquantizers": 16,
+    "pq_bits": 8,
+    "pq_codebook_dtype": "float32",
+    "pq_retain_full_vectors": false,
+    "ivf_lists": 4096,
+    "ivf_nprobe": 16,
+    "ivf_centroid_dtype": "float32",
+    "ivf_list_header_bytes": 0,
+    "query_vectors_per_read": 16,
+    "batch_query_vectors": 256,
+    "score_dtype": "float32"
+  },
+  "routing": {
+    "front_end_fraction": 0.1,
+    "fallback_time_fraction": 0.75,
+    "fallback_read_fraction": 0.05,
+    "target_speedup": 2
+  },
+  "observations": {
+    "illustrative_zero_errors_small_panel": {
+      "kind": "error",
+      "successes": 0,
+      "trials": 100,
+      "confidence": 0.95
+    }
+  }
+}
